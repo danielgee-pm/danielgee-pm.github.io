@@ -1,0 +1,262 @@
+# Retry: create the website files without using f-strings to avoid escaping issues.
+import os, shutil, zipfile, textwrap
+
+site_dir = "/mnt/data/danielgee_site"
+img_src_paths = [
+    "/mnt/data/Screenshot 2025-11-21 104142.png",
+    "/mnt/data/Screenshot 2025-11-21 104150.png",
+    "/mnt/data/Screenshot 2025-11-21 104159.png"
+]
+# ensure clean
+if os.path.exists(site_dir):
+    shutil.rmtree(site_dir)
+os.makedirs(site_dir, exist_ok=True)
+os.makedirs(os.path.join(site_dir, "assets"), exist_ok=True)
+os.makedirs(os.path.join(site_dir, "assets","img"), exist_ok=True)
+
+# Copy images (if they exist); rename to nicer filenames
+img_targets = []
+for i, p in enumerate(img_src_paths, start=1):
+    if os.path.exists(p):
+        tgt = os.path.join(site_dir, "assets", "img", "profile-{}.png".format(i))
+        shutil.copy(p, tgt)
+        img_targets.append("assets/img/profile-{}.png".format(i))
+
+# Build the img tag HTML (use first image if exists)
+if img_targets:
+    img_tag_html = '<img src="{}" alt="profile" />'.format(img_targets[0])
+else:
+    img_tag_html = '<div class="placeholder-pic">DG</div>'
+
+index_html = """
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daniel Gee — Finance & Growth Strategy</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="Daniel Gee — Finance student and growth strategist helping entrepreneurs scale." />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-grid">
+      <div class="brand">
+        <h1>Daniel Gee</h1>
+        <p class="tagline">Finance Student · Growth Strategist for Entrepreneurs</p>
+      </div>
+      <nav class="header-cta">
+        <a class="btn-outline" href="#contact">Contact</a>
+        <a class="btn-solid" href="assets/Daniel_Gee_Resume.pdf" download>Resume</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-left">
+        <h2>Financial catalyst for early-stage businesses</h2>
+        <p>I map leverage points, build models that reveal scalable paths, and help founders turn messy traction into repeatable growth. Comfortable with data, strategy, and the uncomfortable work of execution.</p>
+        <div class="hero-actions">
+          <a class="btn-solid" href="#projects">Projects</a>
+          <a class="btn-ghost" href="#contact">Let's connect</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="profile-card">
+          """ + img_tag_html + """
+          <div class="profile-meta">
+            <p class="role">Finance Student · Marketing Specialist</p>
+            <p class="location">BYU–Idaho · Based in Colorado</p>
+            <p class="pm-note">Also publishes under <em>Publius Marco</em></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="projects">
+      <h3>Selected Projects & Writing</h3>
+      <div class="cards">
+        <article class="card">
+          <h4>Serialized Political Drama (Excerpt)</h4>
+          <p>Speculative fiction project exploring leadership, power, and strategy in a post-apocalyptic setting — includes battlefield logistics and political negotiation scenes.</p>
+          <a class="card-link" href="#writing">Read excerpt</a>
+        </article>
+        <article class="card">
+          <h4>Mission Strategy Notes</h4>
+          <p>Operational notes from full-time service: leadership, area planning, conflict resolution, and growth tactics applied to constrained environments.</p>
+          <a class="card-link" href="#writing">Read notes</a>
+        </article>
+        <article class="card">
+          <h4>Marketing + Growth Work</h4>
+          <p>Hands-on campaigns for local service providers: market research, ad execution, and ROI-driven outreach.</p>
+          <a class="card-link" href="#contact">Get details</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="skills" class="skills">
+      <h3>Skills & Tools</h3>
+      <ul class="skill-grid">
+        <li>Financial Modeling (Excel)</li>
+        <li>Market Research</li>
+        <li>Growth Strategy</li>
+        <li>Data Interpretation</li>
+        <li>Google Ads / Local Campaigns</li>
+        <li>Cross-functional Execution</li>
+      </ul>
+    </section>
+
+    <section id="writing" class="writing">
+      <h3>Selected Writing</h3>
+      <p class="muted">Short excerpts and synopses of longer fiction and analytical pieces.</p>
+      <div class="writing-list">
+        <article>
+          <h4>Ghost — Season 5 Excerpt</h4>
+          <p>Emotional and political stakes collide as a former war hero navigates alliances and trauma.</p>
+        </article>
+        <article>
+          <h4>Strategic Area Notes</h4>
+          <p>Operational playbook-style notes from mission leadership and field strategy.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <h3>Contact</h3>
+      <p>Prefer email: <a href="mailto:danielgee.pm@gmail.com">danielgee.pm@gmail.com</a></p>
+      <p>Or connect on <a href="https://www.linkedin.com/in/danielgee">LinkedIn</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© Daniel Gee · Publius Marco (pen name). Built with intent — ready for strategy.</p>
+      <p class="small">Hosted on GitHub Pages · <a href="https://github.com/danielgee-pm/danielgee-pm.github.io">repo</a></p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+"""
+
+style_css = """
+:root{
+  --bg:#0f1113;
+  --card:#121416;
+  --muted:#9aa3a8;
+  --accent:#8b1f2b;
+  --gold:#b0894b;
+  --white:#eaeaea;
+  --container:1100px;
+  --radius:12px;
+  --mono: 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,#0b0c0d, #0f1113);color:var(--white);font-family:var(--mono);-webkit-font-smoothing:antialiased}
+.container{max-width:var(--container);margin:0 auto;padding:28px}
+
+.site-header{border-bottom:1px solid rgba(255,255,255,0.03);background:transparent;position:sticky;top:0;backdrop-filter:blur(6px);z-index:10}
+.header-grid{display:flex;align-items:center;justify-content:space-between}
+.brand h1{margin:0;font-size:1.25rem;letter-spacing:0.6px}
+.tagline{margin:4px 0 0;color:var(--muted);font-size:0.9rem}
+
+.header-cta a{margin-left:10px;text-decoration:none}
+.btn-solid{background:var(--accent);color:var(--white);padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:600}
+.btn-outline{border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;text-decoration:none;color:var(--white)}
+
+.hero{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:center;padding:40px 0}
+.hero h2{font-size:1.6rem;margin:0 0 12px;color:var(--gold)}
+.hero p{color:var(--muted);line-height:1.5}
+
+.profile-card{background:var(--card);padding:18px;border-radius:14px;display:flex;gap:12px;align-items:center;box-shadow:0 6px 22px rgba(0,0,0,0.6)}
+.profile-card img{width:86px;height:86px;border-radius:10px;object-fit:cover;border:2px solid rgba(255,255,255,0.03)}
+.placeholder-pic{width:86px;height:86px;border-radius:10px;background:#1b1d1f;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+
+.profile-meta .role{margin:0;font-weight:600}
+.profile-meta p{margin:6px 0 0;color:var(--muted);font-size:0.9rem}
+
+.projects{margin-top:36px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:14px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+.card h4{margin:0 0 8px}
+.card p{color:var(--muted);font-size:0.95rem;line-height:1.4}
+.card-link{display:inline-block;margin-top:10px;text-decoration:none;color:var(--gold);font-weight:600}
+
+.skills{margin-top:36px;background:transparent;padding:18px;border-radius:12px}
+.skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;list-style:none;padding:0;margin:0}
+.skill-grid li{background:rgba(255,255,255,0.02);padding:12px;border-radius:8px;color:var(--muted);font-weight:600;}
+
+.writing{margin-top:36px}
+.writing-list article{background:rgba(255,255,255,0.02);padding:14px;border-radius:10px;margin-top:10px;color:var(--muted)}
+
+.contact{margin-top:36px;padding:18px;border-radius:12px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+
+.site-footer{border-top:1px solid rgba(255,255,255,0.03);padding:18px;margin-top:40px;color:var(--muted);font-size:0.95rem}
+.small{font-size:0.8rem;color:var(--muted)}
+
+/* responsive */
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr; padding:20px 0}
+  .cards{grid-template-columns:1fr}
+  .skill-grid{grid-template-columns:repeat(2,1fr)}
+}
+"""
+
+script_js = """
+// Subtle entrance animation
+document.addEventListener('DOMContentLoaded', function(){
+  const cards = document.querySelectorAll('.card');
+  cards.forEach((c, i)=>{
+    c.style.opacity = 0;
+    c.style.transform = 'translateY(8px)';
+    setTimeout(()=>{
+      c.style.transition = 'all 600ms cubic-bezier(.2,.8,.2,1)';
+      c.style.opacity = 1;
+      c.style.transform = 'translateY(0px)';
+    }, 120 * i);
+  });
+});
+"""
+
+readme_md = textwrap.dedent("""
+# Daniel Gee — Personal Site (GitHub Pages)
+
+This repository contains a simple static website intended for GitHub Pages hosting.
+It uses plain HTML/CSS/JS and is designed for a dark, fintech × Publius Marco aesthetic.
+
+## Files included
+- index.html
+- style.css
+- script.js
+- assets/ (images)
+- assets/Daniel_Gee_Resume.pdf (placeholder - replace with actual PDF file)
+
+## Deploying to GitHub Pages
+1. Make sure your repository is named `danielgee-pm.github.io` (it is).
+2. Upload these files to the repository root (you can drag & drop in the web UI).
+3. Commit and wait ~1-2 minutes. Your site will be available at:
+   https://danielgee-pm.github.io
+4. Replace `assets/Daniel_Gee_Resume.pdf` with your actual resume PDF (same filename), or update the link in `index.html`.
+
+## Notes
+- The site uses local images stored in `assets/img/`. You can replace them with your headshot or other images.
+- Edit the content in `index.html` to update text, projects, and contact info.
+""")
+
+# Write files
+with open(os.path.join(site_dir, "index.html"), "w", encoding="utf-8") as f:
+    f.write(index_html)
+with open(os.path.join(site_dir, "style.css"), "w", encoding="utf-8") as f:
+    f.write(style_css)
+with open(os.path.join(site_dir, "script.js"), "w", encoding="utf-8") as f:
+    f.write(script_js)
+with open(os.path.join(site_dir, "README.md"), "w", encoding="utf-8") as f:
+    f.write(readme_md)
+
+# Add placeholder resume (simple text saved as PDF-like file)
+resume_path = os.path.join(site_dir, "assets", "Daniel_Gee_Resume.pdf")
+with open(resume_path, "wb") as f:
+    f.write(b"%PDF-1.4\n%placeholder resume - replace with actual PDF file\n")
